@@ -1,0 +1,22 @@
+name: Bug report
+description: Report a tracker, release, or Obtainium setup problem
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include expected behavior and steps to reproduce. Do not include tokens or account data.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Plexamp version, and Android/Obtainium versions if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Error or workflow link
+      description: Paste the error or link to the failed Actions run. Remove personal information.
