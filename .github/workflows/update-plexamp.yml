@@ -1,0 +1,58 @@
+name: Track Plexamp Beta APK
+
+on:
+  schedule:
+    - cron: '15 */2 * * *' # Controlla ogni 2 ore
+  workflow_dispatch:       # Permette l'avvio manuale dal tab Actions
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Trova ultima versione Beta, scarica APK e crea Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 1. Estrae l'ultima versione dal feed RSS ufficiale delle Release Notes di Plexamp
+          RSS_DATA=$(curl -sL "https://forums.plex.tv/t/plexamp-release-notes/221280.rss")
+          
+          # Cerca specificamente l'ultima versione (inclusa beta)
+          LATEST_VER=$(echo "$RSS_DATA" | grep -oP 'Plexamp v\K[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?' | head -n 1)
+          
+          if [ -z "$LATEST_VER" ]; then
+            echo "Errore: Impossibile estrarre la versione dal feed RSS."
+            exit 1
+          fi
+          
+          echo "Ultima versione rilevata sul forum: v$LATEST_VER"
+          
+          # 2. Controlla se esiste già una Release su questa repo per questa versione
+          if gh release view "v$LATEST_VER" >/dev/null 2>&1; then
+            echo "La release v$LATEST_VER esiste già. Nessuna azione necessaria."
+            exit 0
+          fi
+          
+          # 3. Verifica che il file APK sia effettivamente online sui server di Plex e lo scarica
+          APK_NAME="Plexamp-${LATEST_VER}.apk"
+          APK_URL="https://plexamp.plex.tv/mobile/${APK_NAME}"
+          
+          echo "Scaricamento di $APK_URL..."
+          HTTP_STATUS=$(curl -sL -w "%{http_code}" -o "$APK_NAME" "$APK_URL")
+          
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "L'APK non è ancora disponibile su $APK_URL (HTTP $HTTP_STATUS)."
+            exit 1
+          fi
+          
+          # 4. Pubblica la nuova Release su GitHub allegando l'APK
+          gh release create "v$LATEST_VER" "$APK_NAME" \
+            --title "Plexamp v$LATEST_VER" \
+            --notes "Mirror automatico dell'APK ufficiale di Plexamp Beta scaricato da \`$APK_URL\`." \
+            --prerel
+            ease
