@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="224" height="52" viewBox="0 0 224 52" role="img" aria-label="Add to Obtainium">
+  <rect width="224" height="52" rx="12" fill="#182631"/>
+  <path d="M26 14v18m-7-7 7 7 7-7M17 37h18" fill="none" stroke="#8bd5ca" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="49" y="32" fill="#ffffff" font-family="Arial,sans-serif" font-size="17" font-weight="600">Add to Obtainium</text>
+</svg>
