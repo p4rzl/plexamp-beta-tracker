@@ -2,8 +2,8 @@ name: Track Plexamp Beta APK
 
 on:
   schedule:
-    - cron: '15 */2 * * *' # Controlla ogni 2 ore
-  workflow_dispatch:       # Permette l'avvio manuale dal tab Actions
+    - cron: '15 */2 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,10 +19,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 1. Estrae l'ultima versione dal feed RSS ufficiale delle Release Notes di Plexamp
           RSS_DATA=$(curl -sL "https://forums.plex.tv/t/plexamp-release-notes/221280.rss")
-          
-          # Cerca specificamente l'ultima versione (inclusa beta)
           LATEST_VER=$(echo "$RSS_DATA" | grep -oP 'Plexamp v\K[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?' | head -n 1)
           
           if [ -z "$LATEST_VER" ]; then
@@ -32,13 +29,11 @@ jobs:
           
           echo "Ultima versione rilevata sul forum: v$LATEST_VER"
           
-          # 2. Controlla se esiste già una Release su questa repo per questa versione
           if gh release view "v$LATEST_VER" >/dev/null 2>&1; then
             echo "La release v$LATEST_VER esiste già. Nessuna azione necessaria."
             exit 0
           fi
           
-          # 3. Verifica che il file APK sia effettivamente online sui server di Plex e lo scarica
           APK_NAME="Plexamp-${LATEST_VER}.apk"
           APK_URL="https://plexamp.plex.tv/mobile/${APK_NAME}"
           
@@ -50,9 +45,5 @@ jobs:
             exit 1
           fi
           
-          # 4. Pubblica la nuova Release su GitHub allegando l'APK
-          gh release create "v$LATEST_VER" "$APK_NAME" \
-            --title "Plexamp v$LATEST_VER" \
-            --notes "Mirror automatico dell'APK ufficiale di Plexamp Beta scaricato da \`$APK_URL\`." \
-            --prerel
-            ease
+          gh release create "v$LATEST_VER" "$APK_NAME" -t "Plexamp v$LATEST_VER" -n "Mirror automatico da $APK_URL
+          " -p
