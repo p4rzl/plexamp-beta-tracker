@@ -1,0 +1,7 @@
+{
+  "id": "tv.plex.labs.plexamp",
+  "url": "https://github.com/p4rzl/plexamp-beta-tracker",
+  "author": "Plex, Inc. (unofficial mirror by p4rzl)",
+  "name": "Plexamp Beta",
+  "additionalSettings": "{\"includePrereleases\":true,\"includeDrafts\":false,\"verifyLatestTag\":false,\"apkFilterRegEx\":\"^Plexamp-.*\\\\.apk$\",\"sortMethodChoice\":\"date\"}"
+}
